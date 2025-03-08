@@ -12,25 +12,41 @@ import br.com.pulseapilib.client.filter.ApiPulseFilter;
 import br.com.pulseapilib.client.reporter.ApiPulseReporter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Configuração do cliente API Pulse, registrando o reporter e o filtro.
+ */
 @Configuration
 @EnableConfigurationProperties(ApiPulseConfig.class)
 @RequiredArgsConstructor
 public class ApiPulseClient {
-    private static final Logger logger = LoggerFactory.getLogger(ApiPulseClient.class);
-    private final ApiPulseConfig config;
 
+    private static final Logger logger = LoggerFactory.getLogger(ApiPulseClient.class);
+    private static final String ALL_URL_PATTERNS = "/*";
+
+    private final ApiPulseConfig apiPulseConfig;
+
+    /**
+     * Cria o reporter para envio de status ao API Pulse.
+     */
     @Bean
     public ApiPulseReporter apiPulseReporter() {
         logger.info("Criando reporter...");
-        return new ApiPulseReporter(config);
+        return new ApiPulseReporter(apiPulseConfig);
     }
 
+    /**
+     * Registra o filtro para interceptar requisições HTTP e reportar falhas.
+     */
     @Bean
     public FilterRegistrationBean<ApiPulseFilter> apiPulseFilter(ApiPulseReporter reporter) {
         logger.info("Registrando filtro...");
-        FilterRegistrationBean<ApiPulseFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new ApiPulseFilter(reporter, config.getServerUrl()));
-        registrationBean.addUrlPatterns("/*");
-        return registrationBean;
+        return createFilterRegistration(reporter);
+    }
+
+    private FilterRegistrationBean<ApiPulseFilter> createFilterRegistration(ApiPulseReporter reporter) {
+        FilterRegistrationBean<ApiPulseFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new ApiPulseFilter(reporter, apiPulseConfig.getServerUrl()));
+        registration.addUrlPatterns(ALL_URL_PATTERNS);
+        return registration;
     }
 }

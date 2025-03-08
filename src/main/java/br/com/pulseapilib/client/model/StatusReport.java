@@ -4,12 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data 
-@AllArgsConstructor 
+/**
+ * Representa um relatório de status de uma API para envio ao sistema de monitoramento.
+ */
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
 public class StatusReport {
+
     private String apiUrl;
-    private int status;
+    private int statusCode;
     private String endpoint;
     private String chatId;
     private String accessToken;

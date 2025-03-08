@@ -4,20 +4,31 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import lombok.Data;
 
+/**
+ * Configuração do API Pulse mapeada a partir das propriedades com prefixo 'api-pulse'.
+ */
 @ConfigurationProperties(prefix = "api-pulse")
 @Data
 public class ApiPulseConfig {
-    private String serverUrl;    // URL do API Pulse
-    private String accessToken;  // Token recebido no registro
-    private String telegramToken;// Token do bot Telegram
-    private String telegramUsername; // Username do bot Telegram
-    private String chatId;       // ID do chat Telegram
 
+    private String serverUrl;
+    private String accessToken;
+    private String telegramToken;
+    private String telegramUsername;
+    private String chatId;
+
+    /**
+     * Verifica se todas as propriedades obrigatórias estão preenchidas.
+     */
     public boolean isValid() {
-        return serverUrl != null && !serverUrl.isEmpty() &&
-               accessToken != null && !accessToken.isEmpty() &&
-               telegramToken != null && !telegramToken.isEmpty() &&
-               telegramUsername != null && !telegramUsername.isEmpty() &&
-               chatId != null && !chatId.isEmpty();
+        return isPresent(serverUrl) &&
+               isPresent(accessToken) &&
+               isPresent(telegramToken) &&
+               isPresent(telegramUsername) &&
+               isPresent(chatId);
+    }
+
+    private boolean isPresent(String value) {
+        return value != null && !value.isEmpty();
     }
 }

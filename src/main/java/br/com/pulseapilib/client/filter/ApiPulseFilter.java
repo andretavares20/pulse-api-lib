@@ -11,23 +11,34 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor 
+/**
+ * Filtro que intercepta requisições HTTP e reporta falhas ao API Pulse.
+ */
+@RequiredArgsConstructor
 public class ApiPulseFilter extends OncePerRequestFilter {
-    private final ApiPulseReporter reporter;
+
+    private final ApiPulseReporter apiPulseReporter;
     private final String apiUrl;
 
+    /**
+     * Processa a requisição e reporta o status se houver falha.
+     */
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        chain.doFilter(request, response);
-        int status = response.getStatus();
+        filterChain.doFilter(request, response);
+        int statusCode = response.getStatus();
         String endpoint = request.getRequestURI();
-        reportIfException(status, endpoint);
+        reportFailureIfNeeded(statusCode, endpoint);
     }
 
-    private void reportIfException(int status, String endpoint) {
-        if (status != 200) {
-            reporter.reportStatus(apiUrl, status, endpoint);
+    private void reportFailureIfNeeded(int statusCode, String endpoint) {
+        if (isFailureStatus(statusCode)) {
+            apiPulseReporter.reportStatus(apiUrl, statusCode, endpoint);
         }
+    }
+
+    private boolean isFailureStatus(int statusCode) {
+        return statusCode != 200 && statusCode != 201; 
     }
 }
