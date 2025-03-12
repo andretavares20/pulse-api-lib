@@ -12,7 +12,8 @@ import lombok.Data;
 public class ApiPulseConfig {
 
     private String serverUrl;
-    private String accessToken;
+    private String email;
+    private String password;
     private String telegramToken;
     private String telegramUsername;
     private String chatId;
@@ -22,7 +23,8 @@ public class ApiPulseConfig {
      */
     public boolean isValid() {
         return isPresent(serverUrl) &&
-               isPresent(accessToken) &&
+               isPresent(email) &&
+               isPresent(password) &&
                isPresent(telegramToken) &&
                isPresent(telegramUsername) &&
                isPresent(chatId);
@@ -30,5 +32,16 @@ public class ApiPulseConfig {
 
     private boolean isPresent(String value) {
         return value != null && !value.isEmpty();
+    }
+
+    // Método para limpar o token, se necessário (opcional)
+    private String accessToken;
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 }
